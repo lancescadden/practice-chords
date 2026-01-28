@@ -789,6 +789,12 @@
             flex-wrap: wrap;
         }
 
+        .song-actions-top {
+            margin-bottom: 24px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid var(--border);
+        }
+
         .btn-large {
             padding: 14px 28px;
             font-size: 1rem;
@@ -1718,16 +1724,7 @@
                 </div>
             </div>
 
-            <div class="song-chords-used">
-                <div class="song-chords-label">Chords Used</div>
-                <div class="song-chords-list" id="song-detail-chords"></div>
-            </div>
-
-            <div class="song-structure" id="song-structure">
-                <!-- Structure sections will be rendered here -->
-            </div>
-
-            <div class="song-actions">
+            <div class="song-actions song-actions-top">
                 <button class="btn btn-primary btn-large" onclick="playSongWithStructure()">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                         <polygon points="5 3 19 12 5 21 5 3"></polygon>
@@ -1737,6 +1734,15 @@
                 <button class="btn btn-secondary btn-large" onclick="playSongSimple()">
                     Quick Practice (Chords Only)
                 </button>
+            </div>
+
+            <div class="song-chords-used">
+                <div class="song-chords-label">Chords Used</div>
+                <div class="song-chords-list" id="song-detail-chords"></div>
+            </div>
+
+            <div class="song-structure" id="song-structure">
+                <!-- Structure sections will be rendered here -->
             </div>
         </div>
 
