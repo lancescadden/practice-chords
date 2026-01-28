@@ -1675,6 +1675,217 @@
             max-width: 320px;
             margin: 0 auto;
         }
+
+        /* Experimental Section */
+        .experimental-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .experimental-header h2 {
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #8b5cf6 0%, #06b6d4 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .experimental-subtitle {
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+
+        .artist-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .artist-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .artist-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(139, 92, 246, 0.15);
+        }
+
+        .artist-card-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .artist-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent) 0%, #06b6d4 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white;
+        }
+
+        .artist-card-info h3 {
+            font-size: 1.2rem;
+            margin-bottom: 4px;
+        }
+
+        .artist-card-info p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .artist-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .artist-tag {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 4px 12px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .artist-tag.tuning {
+            background: rgba(139, 92, 246, 0.15);
+            border-color: rgba(139, 92, 246, 0.3);
+            color: #a78bfa;
+        }
+
+        .artist-sound-profile {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            margin-bottom: 32px;
+        }
+
+        .sound-profile-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 16px;
+        }
+
+        .sound-profile-item {
+            text-align: center;
+        }
+
+        .sound-profile-item label {
+            display: block;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .sound-profile-item span {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .artist-section {
+            margin-bottom: 32px;
+        }
+
+        .artist-section h3 {
+            font-size: 1.2rem;
+            margin-bottom: 8px;
+        }
+
+        .section-hint {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 16px;
+        }
+
+        .artist-chords-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 16px;
+        }
+
+        .artist-chord-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .artist-chord-card:hover {
+            border-color: var(--accent);
+            background: var(--bg-tertiary);
+        }
+
+        .artist-chord-card .chord-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .artist-chord-card .chord-notes {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-family: monospace;
+        }
+
+        .artist-progressions {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .artist-progression {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .artist-progression:hover {
+            border-color: var(--accent);
+        }
+
+        .artist-progression-name {
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .artist-progression-chords {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .artist-progression-chord {
+            background: var(--bg-tertiary);
+            border-radius: 4px;
+            padding: 4px 10px;
+            font-size: 0.9rem;
+            font-family: monospace;
+        }
     </style>
 </head>
 <body>
@@ -1693,6 +1904,7 @@
             <button class="nav-tab" data-view="progressions" role="tab" aria-selected="false">Progressions</button>
             <button class="nav-tab" data-view="trainer" role="tab" aria-selected="false">Practice</button>
             <button class="nav-tab" data-view="browse" role="tab" aria-selected="false">Browse Chords</button>
+            <button class="nav-tab" data-view="experimental" role="tab" aria-selected="false">Experimental</button>
         </nav>
 
         <!-- Songs View -->
@@ -1817,6 +2029,65 @@
             </div>
             <!-- Chord categories below -->
             <div id="chord-categories"></div>
+        </div>
+
+        <!-- Experimental View -->
+        <div id="experimental-view" class="view" role="tabpanel">
+            <div class="experimental-header">
+                <h2>Experimental</h2>
+                <p class="experimental-subtitle">Sound like your favorite artists with signature tunings, chords, and progressions</p>
+            </div>
+
+            <div class="artist-cards" id="artist-cards">
+                <!-- Artist cards rendered here -->
+            </div>
+        </div>
+
+        <!-- Artist Detail View -->
+        <div id="artist-detail-view" class="view" role="tabpanel">
+            <div class="song-detail-header">
+                <button class="btn btn-secondary" onclick="backToExperimental()">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 12H5M12 19l-7-7 7-7"></path>
+                    </svg>
+                    Back
+                </button>
+                <div class="song-detail-title">
+                    <h2 id="artist-detail-name">Artist Name</h2>
+                    <p id="artist-detail-tuning">Tuning: Drop D</p>
+                </div>
+            </div>
+
+            <div class="artist-sound-profile" id="artist-sound-profile">
+                <!-- Sound profile info -->
+            </div>
+
+            <div class="artist-section">
+                <h3>Signature Chords</h3>
+                <p class="section-hint">These voicings capture the artist's sound. Click to hear.</p>
+                <div class="artist-chords-grid" id="artist-chords-grid">
+                    <!-- Chord cards rendered here -->
+                </div>
+            </div>
+
+            <div class="artist-section">
+                <h3>Progressions</h3>
+                <p class="section-hint">Common progressions in their style. Click to play through.</p>
+                <div class="artist-progressions" id="artist-progressions">
+                    <!-- Progressions rendered here -->
+                </div>
+            </div>
+
+            <div class="artist-section">
+                <h3>Jam Mode</h3>
+                <p class="section-hint">Practice these progressions with the signature sound.</p>
+                <button class="btn btn-primary btn-large" id="artist-jam-btn" onclick="startArtistJam()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                    </svg>
+                    Start Jam
+                </button>
+            </div>
         </div>
 
         <!-- Practice View -->
@@ -6777,6 +7048,55 @@
         let currentGenreFilter = 'All';
         let playAlongFilterEnabled = false;
 
+        // Experimental Section - Artist Sound Profiles
+        let currentArtist = null;
+        let currentTuning = 'standard';
+
+        const TUNINGS = {
+            standard: { name: 'Standard', notes: 'E-A-D-G-B-E', freqs: [82.41, 110.00, 146.83, 196.00, 246.94, 329.63] },
+            dropD: { name: 'Drop D', notes: 'D-A-D-G-B-E', freqs: [73.42, 110.00, 146.83, 196.00, 246.94, 329.63] },
+            dropC: { name: 'Drop C', notes: 'C-G-C-F-A-D', freqs: [65.41, 98.00, 130.81, 174.61, 220.00, 293.66] },
+            openD: { name: 'Open D', notes: 'D-A-D-F#-A-D', freqs: [73.42, 110.00, 146.83, 185.00, 220.00, 293.66] }
+        };
+
+        const ARTISTS = [
+            {
+                id: 'deftones',
+                name: 'Deftones',
+                genre: 'Alternative Metal',
+                tuning: 'dropD',
+                description: 'Atmospheric metal with shoegaze influences, dreamy clean sections contrasting with heavy riffs',
+                tags: ['Drop D', 'Atmospheric', 'Shoegaze', 'Heavy'],
+                profile: {
+                    style: 'Atmospheric Metal',
+                    tone: 'Clean + Heavy Distortion',
+                    effects: 'Chorus, Delay, Reverb',
+                    techniques: 'Palm muting, Arpeggios, Swells'
+                },
+                chords: [
+                    { name: 'D5 (Drop D)', frets: [0, 0, 0, -1, -1, -1], description: 'Root power chord' },
+                    { name: 'F5', frets: [3, 3, 3, -1, -1, -1], description: 'Power chord' },
+                    { name: 'G5', frets: [5, 5, 5, -1, -1, -1], description: 'Power chord' },
+                    { name: 'Bb5', frets: [8, 8, 8, -1, -1, -1], description: 'Power chord' },
+                    { name: 'Dm add9', frets: [0, 0, 0, 2, 3, 0], description: 'Atmospheric voicing' },
+                    { name: 'Fmaj7', frets: [3, 3, 3, 2, 1, 0], description: 'Dreamy clean chord' },
+                    { name: 'Am7 (Drop D)', frets: [7, 0, 7, 5, 5, 5], description: 'Moody minor 7th' },
+                    { name: 'Gsus2', frets: [5, 5, 5, 4, 3, 5], description: 'Suspended atmosphere' },
+                    { name: 'D octave', frets: [0, -1, 0, -1, -1, -1], description: 'Heavy octave riff' },
+                    { name: 'E5 (Drop D)', frets: [2, 2, 2, -1, -1, -1], description: 'Tension chord' },
+                    { name: 'A5 (Drop D)', frets: [7, 7, 7, -1, -1, -1], description: 'Power chord' },
+                    { name: 'C5', frets: [10, 10, 10, -1, -1, -1], description: 'High power chord' }
+                ],
+                progressions: [
+                    { name: 'My Own Summer Style', chords: ['D5 (Drop D)', 'F5', 'G5', 'Bb5'], mood: 'Heavy, driving' },
+                    { name: 'Digital Bath Atmosphere', chords: ['Dm add9', 'Fmaj7', 'Gsus2', 'Am7 (Drop D)'], mood: 'Dreamy, ethereal' },
+                    { name: 'Change (In the House of Flies)', chords: ['D5 (Drop D)', 'A5 (Drop D)', 'E5 (Drop D)', 'G5'], mood: 'Dynamic, building' },
+                    { name: 'Be Quiet and Drive', chords: ['D5 (Drop D)', 'G5', 'Bb5', 'F5'], mood: 'Aggressive, melodic' },
+                    { name: 'Passenger Verse', chords: ['Dm add9', 'Fmaj7', 'Am7 (Drop D)', 'Gsus2'], mood: 'Haunting, beautiful' }
+                ]
+            }
+        ];
+
         // Practice Chords State - Comprehensive categories for all chords
         const CHORD_TYPES = [
             { id: 'Major', label: 'Major', chords: ['C','C#','Db','D','D#','Eb','E','F','F#','Gb','G','G#','Ab','A','A#','Bb','B'] },
@@ -7362,6 +7682,192 @@
             `).join('');
         }
 
+        // Experimental Section Rendering
+        function renderArtistCards() {
+            const container = document.getElementById('artist-cards');
+            container.innerHTML = ARTISTS.map(artist => `
+                <div class="artist-card" onclick="showArtistDetail('${artist.id}')">
+                    <div class="artist-card-header">
+                        <div class="artist-avatar">${artist.name.charAt(0)}</div>
+                        <div class="artist-card-info">
+                            <h3>${artist.name}</h3>
+                            <p>${artist.genre}</p>
+                        </div>
+                    </div>
+                    <div class="artist-tags">
+                        ${artist.tags.map(tag => `<span class="artist-tag${tag.includes('Drop') || tag.includes('Open') ? ' tuning' : ''}">${tag}</span>`).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function showArtistDetail(artistId) {
+            const artist = ARTISTS.find(a => a.id === artistId);
+            if (!artist) return;
+
+            currentArtist = artist;
+            currentTuning = artist.tuning;
+
+            // Update header
+            document.getElementById('artist-detail-name').textContent = artist.name;
+            document.getElementById('artist-detail-tuning').textContent = `Tuning: ${TUNINGS[artist.tuning].name} (${TUNINGS[artist.tuning].notes})`;
+
+            // Render sound profile
+            document.getElementById('artist-sound-profile').innerHTML = `
+                <div class="sound-profile-grid">
+                    <div class="sound-profile-item">
+                        <label>Style</label>
+                        <span>${artist.profile.style}</span>
+                    </div>
+                    <div class="sound-profile-item">
+                        <label>Tone</label>
+                        <span>${artist.profile.tone}</span>
+                    </div>
+                    <div class="sound-profile-item">
+                        <label>Effects</label>
+                        <span>${artist.profile.effects}</span>
+                    </div>
+                    <div class="sound-profile-item">
+                        <label>Techniques</label>
+                        <span>${artist.profile.techniques}</span>
+                    </div>
+                </div>
+            `;
+
+            // Render chords
+            document.getElementById('artist-chords-grid').innerHTML = artist.chords.map((chord, idx) => `
+                <div class="artist-chord-card" onclick="playArtistChord(${idx})">
+                    <div class="chord-name">${chord.name}</div>
+                    <div class="chord-notes">${chord.frets.map(f => f < 0 ? 'x' : f).join('-')}</div>
+                </div>
+            `).join('');
+
+            // Render progressions
+            document.getElementById('artist-progressions').innerHTML = artist.progressions.map((prog, idx) => `
+                <div class="artist-progression" onclick="playArtistProgression(${idx})">
+                    <div class="artist-progression-name">${prog.name} <span style="color: var(--text-muted); font-weight: normal; font-size: 0.85rem;">(${prog.mood})</span></div>
+                    <div class="artist-progression-chords">
+                        ${prog.chords.map(c => `<span class="artist-progression-chord">${c}</span>`).join('')}
+                    </div>
+                </div>
+            `).join('');
+
+            // Switch to detail view
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            document.getElementById('artist-detail-view').classList.add('active');
+        }
+
+        function backToExperimental() {
+            currentArtist = null;
+            currentTuning = 'standard';
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            document.getElementById('experimental-view').classList.add('active');
+        }
+
+        function playArtistChord(chordIdx) {
+            if (!currentArtist) return;
+            const chord = currentArtist.chords[chordIdx];
+            playCustomChordSound(chord.frets, currentTuning);
+        }
+
+        function playCustomChordSound(frets, tuningKey = 'standard') {
+            if (!soundEnabled) return;
+            initAudio();
+
+            const tuning = TUNINGS[tuningKey];
+            const now = audioContext.currentTime;
+
+            const masterGain = audioContext.createGain();
+            masterGain.gain.value = distortionEnabled ? 0.4 : 0.25;
+
+            if (distortionEnabled) {
+                const preGain = audioContext.createGain();
+                preGain.gain.value = 2.5;
+                const postGain = audioContext.createGain();
+                postGain.gain.value = 0.5;
+                const dryGain = audioContext.createGain();
+                dryGain.gain.value = 0.7;
+                const wetGain = audioContext.createGain();
+                wetGain.gain.value = 0.3;
+
+                masterGain.connect(preGain);
+                preGain.connect(distortionNode);
+                distortionNode.connect(postGain);
+                postGain.connect(dryGain);
+                postGain.connect(reverbNode);
+                reverbNode.connect(wetGain);
+                dryGain.connect(audioContext.destination);
+                wetGain.connect(audioContext.destination);
+            } else {
+                masterGain.connect(audioContext.destination);
+            }
+
+            frets.forEach((fret, i) => {
+                if (fret < 0) return;
+                const freq = tuning.freqs[i] * Math.pow(FRET_RATIO, fret);
+                const delay = i * 0.025;
+
+                const harmonics = distortionEnabled ? [1, 2, 3, 4] : [1, 2, 3];
+                const gains = distortionEnabled ? [1, 0.5, 0.3, 0.15] : [1, 0.3, 0.1];
+
+                harmonics.forEach((harmonic, h) => {
+                    const osc = audioContext.createOscillator();
+                    const gain = audioContext.createGain();
+
+                    osc.type = distortionEnabled ? 'sawtooth' : 'triangle';
+                    osc.frequency.value = freq * harmonic;
+                    osc.detune.value = (Math.random() - 0.5) * 6;
+
+                    const volume = 0.15 * gains[h];
+                    const decay = distortionEnabled ? 2.5 : 1.8;
+
+                    gain.gain.setValueAtTime(0, now + delay);
+                    gain.gain.linearRampToValueAtTime(volume, now + delay + 0.01);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + delay + decay);
+
+                    osc.connect(gain);
+                    gain.connect(masterGain);
+
+                    osc.start(now + delay);
+                    osc.stop(now + delay + decay + 0.1);
+                });
+            });
+        }
+
+        let artistJamInterval = null;
+        let artistJamIndex = 0;
+        let artistJamProgression = null;
+
+        function playArtistProgression(progIdx) {
+            if (!currentArtist) return;
+            artistJamProgression = currentArtist.progressions[progIdx];
+            artistJamIndex = 0;
+
+            // Play first chord immediately
+            const firstChord = currentArtist.chords.find(c => c.name === artistJamProgression.chords[0]);
+            if (firstChord) playCustomChordSound(firstChord.frets, currentTuning);
+
+            // Start cycling through
+            if (artistJamInterval) clearInterval(artistJamInterval);
+            artistJamInterval = setInterval(() => {
+                artistJamIndex = (artistJamIndex + 1) % artistJamProgression.chords.length;
+                const chordName = artistJamProgression.chords[artistJamIndex];
+                const chord = currentArtist.chords.find(c => c.name === chordName);
+                if (chord) playCustomChordSound(chord.frets, currentTuning);
+            }, 2000);
+
+            // Stop after 4 cycles
+            setTimeout(() => {
+                if (artistJamInterval) clearInterval(artistJamInterval);
+                artistJamInterval = null;
+            }, 2000 * artistJamProgression.chords.length * 4);
+        }
+
+        function startArtistJam() {
+            if (!currentArtist || currentArtist.progressions.length === 0) return;
+            playArtistProgression(0);
+        }
+
         function renderBrowseChords() {
             const container = document.getElementById('chord-categories');
             const categories = {};
@@ -7426,6 +7932,7 @@
                 trainerSpeedDisplay.textContent = getInvertedSpeed(trainerSlider.value);
             });
             renderBrowseChords();
+            renderArtistCards();
 
             document.querySelectorAll('.nav-tab').forEach(tab => {
                 tab.addEventListener('click', () => switchView(tab.dataset.view));
