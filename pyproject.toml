@@ -1,0 +1,36 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "chord-trainer"
+version = "1.0.0"
+description = "A terminal-based guitar chord training app"
+readme = "README.md"
+requires-python = ">=3.9"
+license = "MIT"
+authors = [{ name = "Lance" }]
+keywords = ["guitar", "chords", "music", "practice", "terminal"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: End Users/Desktop",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Topic :: Multimedia :: Sound/Audio",
+]
+dependencies = [
+    "rich>=13.0",
+]
+
+[project.optional-dependencies]
+audio = [
+    "numpy>=1.24",
+    "sounddevice>=0.4",
+]
+
+[project.scripts]
+chord-trainer = "chord_trainer.__main__:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["chord_trainer"]
