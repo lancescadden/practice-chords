@@ -416,6 +416,12 @@
             border-color: var(--accent);
         }
 
+        .btn-active {
+            background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+            border-color: #8b5cf6;
+            color: white;
+        }
+
         .btn-icon {
             padding: 12px;
             min-width: 48px;
@@ -1842,6 +1848,15 @@
                             <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
                             <line x1="23" y1="9" x2="17" y2="15"></line>
                             <line x1="17" y1="9" x2="23" y2="15"></line>
+                        </svg>
+                    </button>
+                    <button class="btn btn-secondary btn-icon" id="distortion-btn" title="Toggle Distortion" aria-label="Toggle distortion">
+                        <svg id="distortion-off-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path>
+                        </svg>
+                        <svg id="distortion-on-icon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="display:none;">
+                            <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" stroke="currentColor" stroke-width="2"></path>
+                            <circle cx="12" cy="12" r="5" fill="#8b5cf6"></circle>
                         </svg>
                     </button>
                     <button class="btn btn-secondary" id="back-btn">
@@ -6786,10 +6801,46 @@
         // ============================================================================
         // AUDIO
         // ============================================================================
+        let distortionEnabled = false;
+        let distortionNode = null;
+        let reverbNode = null;
+
         function initAudio() {
             if (!audioContext) {
                 audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                // Create distortion curve
+                distortionNode = audioContext.createWaveShaper();
+                distortionNode.curve = makeDistortionCurve(400);
+                distortionNode.oversample = '4x';
+                // Create convolver for reverb
+                reverbNode = createReverb();
             }
+        }
+
+        function makeDistortionCurve(amount) {
+            const samples = 44100;
+            const curve = new Float32Array(samples);
+            const deg = Math.PI / 180;
+            for (let i = 0; i < samples; i++) {
+                const x = (i * 2) / samples - 1;
+                curve[i] = ((3 + amount) * x * 20 * deg) / (Math.PI + amount * Math.abs(x));
+            }
+            return curve;
+        }
+
+        function createReverb() {
+            const convolver = audioContext.createConvolver();
+            const rate = audioContext.sampleRate;
+            const length = rate * 1.5;
+            const impulse = audioContext.createBuffer(2, length, rate);
+            for (let channel = 0; channel < 2; channel++) {
+                const data = impulse.getChannelData(channel);
+                for (let i = 0; i < length; i++) {
+                    data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / length, 2);
+                }
+            }
+            convolver.buffer = impulse;
+            return convolver;
         }
 
         const STRING_FREQS = [82.41, 110.00, 146.83, 196.00, 246.94, 329.63];
@@ -6803,25 +6854,65 @@
             initAudio();
             const now = audioContext.currentTime;
 
+            // Master gain for overall volume
+            const masterGain = audioContext.createGain();
+            masterGain.gain.value = distortionEnabled ? 0.4 : 0.25;
+
+            if (distortionEnabled) {
+                // Distortion chain: gain -> distortion -> reverb -> output
+                const preGain = audioContext.createGain();
+                preGain.gain.value = 2.5;
+                const postGain = audioContext.createGain();
+                postGain.gain.value = 0.5;
+                const dryGain = audioContext.createGain();
+                dryGain.gain.value = 0.7;
+                const wetGain = audioContext.createGain();
+                wetGain.gain.value = 0.3;
+
+                masterGain.connect(preGain);
+                preGain.connect(distortionNode);
+                distortionNode.connect(postGain);
+                postGain.connect(dryGain);
+                postGain.connect(reverbNode);
+                reverbNode.connect(wetGain);
+                dryGain.connect(audioContext.destination);
+                wetGain.connect(audioContext.destination);
+            } else {
+                masterGain.connect(audioContext.destination);
+            }
+
             chord.frets.forEach((fret, i) => {
                 if (fret < 0) return;
                 const freq = STRING_FREQS[i] * Math.pow(FRET_RATIO, fret);
-                const delay = i * 0.03;
+                const delay = i * 0.025;
 
-                const osc = audioContext.createOscillator();
-                const gain = audioContext.createGain();
+                // Fundamental + harmonics for richer sound
+                const harmonics = distortionEnabled ? [1, 2, 3, 4] : [1, 2, 3];
+                const gains = distortionEnabled ? [1, 0.5, 0.3, 0.15] : [1, 0.3, 0.1];
 
-                osc.type = 'triangle';
-                osc.frequency.value = freq;
+                harmonics.forEach((harmonic, h) => {
+                    const osc = audioContext.createOscillator();
+                    const gain = audioContext.createGain();
 
-                gain.gain.setValueAtTime(0.3, now + delay);
-                gain.gain.exponentialRampToValueAtTime(0.01, now + delay + 1.5);
+                    osc.type = distortionEnabled ? 'sawtooth' : 'triangle';
+                    osc.frequency.value = freq * harmonic;
 
-                osc.connect(gain);
-                gain.connect(audioContext.destination);
+                    // Slight detune for warmth
+                    osc.detune.value = (Math.random() - 0.5) * 6;
 
-                osc.start(now + delay);
-                osc.stop(now + delay + 1.5);
+                    const volume = 0.15 * gains[h];
+                    const decay = distortionEnabled ? 2.5 : 1.8;
+
+                    gain.gain.setValueAtTime(0, now + delay);
+                    gain.gain.linearRampToValueAtTime(volume, now + delay + 0.01);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + delay + decay);
+
+                    osc.connect(gain);
+                    gain.connect(masterGain);
+
+                    osc.start(now + delay);
+                    osc.stop(now + delay + decay + 0.1);
+                });
             });
         }
 
@@ -7359,6 +7450,13 @@
                 soundEnabled = !soundEnabled;
                 document.getElementById('sound-on-icon').style.display = soundEnabled ? 'block' : 'none';
                 document.getElementById('sound-off-icon').style.display = soundEnabled ? 'none' : 'block';
+            });
+
+            document.getElementById('distortion-btn').addEventListener('click', () => {
+                distortionEnabled = !distortionEnabled;
+                document.getElementById('distortion-off-icon').style.display = distortionEnabled ? 'none' : 'block';
+                document.getElementById('distortion-on-icon').style.display = distortionEnabled ? 'block' : 'none';
+                document.getElementById('distortion-btn').classList.toggle('btn-active', distortionEnabled);
             });
 
             document.getElementById('back-btn').addEventListener('click', () => {
