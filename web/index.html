@@ -7371,11 +7371,12 @@
         let reverbNode = null;
         let compressorNode = null;
         let masterOutputGain = null;
-        let audioUnlocked = false;
 
-        function initAudio() {
+        async function initAudio() {
             if (!audioContext) {
-                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                // Create AudioContext - must happen in response to user gesture on iOS
+                const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+                audioContext = new AudioContextClass();
 
                 // Create master output chain with compressor for consistent volume
                 compressorNode = audioContext.createDynamicsCompressor();
@@ -7386,7 +7387,7 @@
                 compressorNode.release.value = 0.25;
 
                 masterOutputGain = audioContext.createGain();
-                masterOutputGain.gain.value = 2.0; // Boost overall output
+                masterOutputGain.gain.value = 2.5; // Boost overall output
 
                 compressorNode.connect(masterOutputGain);
                 masterOutputGain.connect(audioContext.destination);
@@ -7399,37 +7400,29 @@
                 reverbNode = createReverb();
             }
 
-            // iOS/Safari: Resume suspended audio context
+            // iOS/Safari: Resume suspended audio context (MUST await this)
             if (audioContext.state === 'suspended') {
-                audioContext.resume();
+                try {
+                    await audioContext.resume();
+                } catch (e) {
+                    console.log('Audio resume failed:', e);
+                }
+            }
+
+            return audioContext.state === 'running';
+        }
+
+        // Eager initialization on any user interaction for iOS
+        function handleUserGesture() {
+            if (!audioContext || audioContext.state === 'suspended') {
+                initAudio();
             }
         }
 
-        // Unlock audio on first user interaction (required for iOS)
-        function unlockAudio() {
-            if (audioUnlocked) return;
-
-            initAudio();
-
-            // Play silent buffer to unlock
-            const buffer = audioContext.createBuffer(1, 1, 22050);
-            const source = audioContext.createBufferSource();
-            source.buffer = buffer;
-            source.connect(audioContext.destination);
-            source.start(0);
-
-            audioUnlocked = true;
-
-            // Remove listeners after unlock
-            document.removeEventListener('touchstart', unlockAudio);
-            document.removeEventListener('touchend', unlockAudio);
-            document.removeEventListener('click', unlockAudio);
-        }
-
-        // Add unlock listeners for iOS
-        document.addEventListener('touchstart', unlockAudio, { once: true });
-        document.addEventListener('touchend', unlockAudio, { once: true });
-        document.addEventListener('click', unlockAudio, { once: true });
+        // Multiple event types for iOS compatibility
+        ['touchstart', 'touchend', 'mousedown', 'click', 'keydown'].forEach(event => {
+            document.addEventListener(event, handleUserGesture, { passive: true });
+        });
 
         function makeDistortionCurve(amount) {
             const samples = 44100;
@@ -7465,7 +7458,21 @@
             const chord = CHORDS[chordName];
             if (!chord) return;
 
+            // Initialize and resume audio (handles iOS)
             initAudio();
+
+            // Extra iOS safety: try resume again synchronously
+            if (audioContext && audioContext.state === 'suspended') {
+                audioContext.resume();
+            }
+
+            // Bail if context isn't ready yet
+            if (!audioContext || audioContext.state !== 'running') {
+                // Try again in a moment after resume completes
+                setTimeout(() => playChordSound(chordName), 100);
+                return;
+            }
+
             const now = audioContext.currentTime;
 
             // Master gain for overall volume (boosted for mobile)
@@ -8066,7 +8073,20 @@
 
         function playCustomChordSound(frets, tuningKey = 'standard') {
             if (!soundEnabled) return;
+
+            // Initialize and resume audio (handles iOS)
             initAudio();
+
+            // Extra iOS safety: try resume again synchronously
+            if (audioContext && audioContext.state === 'suspended') {
+                audioContext.resume();
+            }
+
+            // Bail if context isn't ready yet
+            if (!audioContext || audioContext.state !== 'running') {
+                setTimeout(() => playCustomChordSound(frets, tuningKey), 100);
+                return;
+            }
 
             const tuning = TUNINGS[tuningKey];
             const now = audioContext.currentTime;
