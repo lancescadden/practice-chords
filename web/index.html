@@ -7369,10 +7369,28 @@
         let distortionEnabled = false;
         let distortionNode = null;
         let reverbNode = null;
+        let compressorNode = null;
+        let masterOutputGain = null;
+        let audioUnlocked = false;
 
         function initAudio() {
             if (!audioContext) {
                 audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+                // Create master output chain with compressor for consistent volume
+                compressorNode = audioContext.createDynamicsCompressor();
+                compressorNode.threshold.value = -24;
+                compressorNode.knee.value = 30;
+                compressorNode.ratio.value = 12;
+                compressorNode.attack.value = 0.003;
+                compressorNode.release.value = 0.25;
+
+                masterOutputGain = audioContext.createGain();
+                masterOutputGain.gain.value = 2.0; // Boost overall output
+
+                compressorNode.connect(masterOutputGain);
+                masterOutputGain.connect(audioContext.destination);
+
                 // Create distortion curve
                 distortionNode = audioContext.createWaveShaper();
                 distortionNode.curve = makeDistortionCurve(400);
@@ -7380,7 +7398,38 @@
                 // Create convolver for reverb
                 reverbNode = createReverb();
             }
+
+            // iOS/Safari: Resume suspended audio context
+            if (audioContext.state === 'suspended') {
+                audioContext.resume();
+            }
         }
+
+        // Unlock audio on first user interaction (required for iOS)
+        function unlockAudio() {
+            if (audioUnlocked) return;
+
+            initAudio();
+
+            // Play silent buffer to unlock
+            const buffer = audioContext.createBuffer(1, 1, 22050);
+            const source = audioContext.createBufferSource();
+            source.buffer = buffer;
+            source.connect(audioContext.destination);
+            source.start(0);
+
+            audioUnlocked = true;
+
+            // Remove listeners after unlock
+            document.removeEventListener('touchstart', unlockAudio);
+            document.removeEventListener('touchend', unlockAudio);
+            document.removeEventListener('click', unlockAudio);
+        }
+
+        // Add unlock listeners for iOS
+        document.addEventListener('touchstart', unlockAudio, { once: true });
+        document.addEventListener('touchend', unlockAudio, { once: true });
+        document.addEventListener('click', unlockAudio, { once: true });
 
         function makeDistortionCurve(amount) {
             const samples = 44100;
@@ -7419,16 +7468,16 @@
             initAudio();
             const now = audioContext.currentTime;
 
-            // Master gain for overall volume
+            // Master gain for overall volume (boosted for mobile)
             const masterGain = audioContext.createGain();
-            masterGain.gain.value = distortionEnabled ? 0.4 : 0.25;
+            masterGain.gain.value = distortionEnabled ? 0.6 : 0.5;
 
             if (distortionEnabled) {
-                // Distortion chain: gain -> distortion -> reverb -> output
+                // Distortion chain: gain -> distortion -> reverb -> compressor
                 const preGain = audioContext.createGain();
-                preGain.gain.value = 2.5;
+                preGain.gain.value = 3.0;
                 const postGain = audioContext.createGain();
-                postGain.gain.value = 0.5;
+                postGain.gain.value = 0.6;
                 const dryGain = audioContext.createGain();
                 dryGain.gain.value = 0.7;
                 const wetGain = audioContext.createGain();
@@ -7440,10 +7489,10 @@
                 postGain.connect(dryGain);
                 postGain.connect(reverbNode);
                 reverbNode.connect(wetGain);
-                dryGain.connect(audioContext.destination);
-                wetGain.connect(audioContext.destination);
+                dryGain.connect(compressorNode);
+                wetGain.connect(compressorNode);
             } else {
-                masterGain.connect(audioContext.destination);
+                masterGain.connect(compressorNode);
             }
 
             chord.frets.forEach((fret, i) => {
@@ -7465,7 +7514,7 @@
                     // Slight detune for warmth
                     osc.detune.value = (Math.random() - 0.5) * 6;
 
-                    const volume = 0.15 * gains[h];
+                    const volume = 0.25 * gains[h];
                     const decay = distortionEnabled ? 2.5 : 1.8;
 
                     gain.gain.setValueAtTime(0, now + delay);
@@ -8023,13 +8072,13 @@
             const now = audioContext.currentTime;
 
             const masterGain = audioContext.createGain();
-            masterGain.gain.value = distortionEnabled ? 0.4 : 0.25;
+            masterGain.gain.value = distortionEnabled ? 0.6 : 0.5;
 
             if (distortionEnabled) {
                 const preGain = audioContext.createGain();
-                preGain.gain.value = 2.5;
+                preGain.gain.value = 3.0;
                 const postGain = audioContext.createGain();
-                postGain.gain.value = 0.5;
+                postGain.gain.value = 0.6;
                 const dryGain = audioContext.createGain();
                 dryGain.gain.value = 0.7;
                 const wetGain = audioContext.createGain();
@@ -8041,10 +8090,10 @@
                 postGain.connect(dryGain);
                 postGain.connect(reverbNode);
                 reverbNode.connect(wetGain);
-                dryGain.connect(audioContext.destination);
-                wetGain.connect(audioContext.destination);
+                dryGain.connect(compressorNode);
+                wetGain.connect(compressorNode);
             } else {
-                masterGain.connect(audioContext.destination);
+                masterGain.connect(compressorNode);
             }
 
             frets.forEach((fret, i) => {
@@ -8063,7 +8112,7 @@
                     osc.frequency.value = freq * harmonic;
                     osc.detune.value = (Math.random() - 0.5) * 6;
 
-                    const volume = 0.15 * gains[h];
+                    const volume = 0.25 * gains[h];
                     const decay = distortionEnabled ? 2.5 : 1.8;
 
                     gain.gain.setValueAtTime(0, now + delay);
