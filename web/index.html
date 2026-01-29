@@ -7797,12 +7797,20 @@
             currentChords = chords.filter(c => CHORDS[c]);
             currentIndex = 0;
 
+            // Save current view's scroll position
+            if (currentView) {
+                scrollPositions[currentView] = window.scrollY;
+            }
+
             document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
             document.getElementById('practice-view').classList.add('active');
             document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
 
             updateChordDisplay();
             document.getElementById('progress-fill').style.width = '0%';
+
+            // Scroll to top
+            window.scrollTo(0, 0);
 
             startPlaying();
         }
@@ -7814,10 +7822,17 @@
             const song = SONGS[idx];
             if (!song) return;
 
+            // Save scroll position and navigation state
+            scrollPositions['songs'] = window.scrollY;
+            navigationHistory.push({ view: 'songs', scroll: window.scrollY });
+
             // Show song detail view
             document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
             document.getElementById('song-detail-view').classList.add('active');
             document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+
+            // Scroll to top
+            window.scrollTo(0, 0);
 
             // Populate song details
             document.getElementById('song-detail-name').textContent = song.title;
@@ -7863,6 +7878,14 @@
             document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
             document.getElementById('songs-view').classList.add('active');
             document.querySelector('.nav-tab[data-view="songs"]').classList.add('active');
+
+            // Restore scroll position
+            const lastNav = navigationHistory.pop();
+            if (lastNav && lastNav.view === 'songs') {
+                setTimeout(() => window.scrollTo(0, lastNav.scroll), 0);
+            } else if (scrollPositions['songs']) {
+                setTimeout(() => window.scrollTo(0, scrollPositions['songs']), 0);
+            }
         }
 
         function playSongWithStructure() {
@@ -8092,6 +8115,10 @@
             const artist = ARTISTS.find(a => a.id === artistId);
             if (!artist) return;
 
+            // Save scroll position and navigation state
+            scrollPositions['experimental'] = window.scrollY;
+            navigationHistory.push({ view: 'experimental', scroll: window.scrollY });
+
             currentArtist = artist;
             currentTuning = artist.tuning;
 
@@ -8142,6 +8169,9 @@
             // Switch to detail view
             document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
             document.getElementById('artist-detail-view').classList.add('active');
+
+            // Scroll to top
+            window.scrollTo(0, 0);
         }
 
         function backToExperimental() {
@@ -8149,6 +8179,14 @@
             currentTuning = 'standard';
             document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
             document.getElementById('experimental-view').classList.add('active');
+
+            // Restore scroll position
+            const lastNav = navigationHistory.pop();
+            if (lastNav && lastNav.view === 'experimental') {
+                setTimeout(() => window.scrollTo(0, lastNav.scroll), 0);
+            } else if (scrollPositions['experimental']) {
+                setTimeout(() => window.scrollTo(0, scrollPositions['experimental']), 0);
+            }
         }
 
         function playArtistChord(chordIdx) {
@@ -8299,7 +8337,16 @@
             if (element) element.classList.add('active');
         }
 
+        // Navigation history for back button
+        let navigationHistory = [];
+        let scrollPositions = {};
+
         function switchView(viewName) {
+            // Save current scroll position before switching
+            if (currentView) {
+                scrollPositions[currentView] = window.scrollY;
+            }
+
             currentView = viewName;
             stopPlaying();
 
@@ -8311,6 +8358,9 @@
                 t.classList.toggle('active', isActive);
                 t.setAttribute('aria-selected', isActive);
             });
+
+            // Scroll to top on view change
+            window.scrollTo(0, 0);
         }
 
         // Event listeners
